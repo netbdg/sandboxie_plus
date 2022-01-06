@@ -1004,6 +1004,17 @@ Function WriteProgramFiles
 WriteLoop:
 
     ;
+    ; Check if SbieDll is still in use, then stop the service 
+    ; to prevent the driver from staying loaded
+    ;
+    
+    Push "scandll$0"
+    Call KmdUtil
+	
+    Push "stop ${SBIESVC}"
+    Call KmdUtil    
+    
+    ;
     ; Write files
     ;
     
@@ -1522,6 +1533,9 @@ Driver_Silent:
 Driver_Upgrade:
 
     WriteRegDWORD HKLM "SYSTEM\CurrentControlSet\Services\${SBIEDRV}" "Start" 3
+    
+    Push "stop ${SBIESVC}"
+    Call KmdUtil
     
     Push "stop ${SBIEDRV}"
     Call KmdUtil
